@@ -1,0 +1,33 @@
+# gh#337 rig: the only second identity this box has.
+# Every pull request here is opened by bredebjorhovd, and GitHub refuses
+# APPROVE / REQUEST_CHANGES on your own pull request — so the review the stacks
+# matrix needs is cast by github-actions[bot] instead.
+name: rig-review
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number
+        required: true
+      event:
+        description: REQUEST_CHANGES, APPROVE or COMMENT
+        required: true
+        default: REQUEST_CHANGES
+      body:
+        description: Review body
+        required: true
+        default: gh#337 rig review
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ inputs.pr }}
+          EVENT: ${{ inputs.event }}
+          BODY: ${{ inputs.body }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api "repos/$REPO/pulls/$PR/reviews" -f event="$EVENT" -f body="$BODY"
